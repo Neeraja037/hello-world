@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    environment {
+        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk'
+        MAVEN_HOME = '/opt/maven'
+        PATH = "${MAVEN_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                echo 'Building the application...'
+                sh 'mvn clean install'  // Maven build command, adjust if using Gradle
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'mvn test'  // Maven test command
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying the application...'
+                // For example, if you're deploying to a server
+                sh 'scp target/your-app.jar ubuntu@<EC2-IP>:/home/ubuntu/your-app.jar'
+                sh 'ssh ubuntu@<EC2-IP> "java -jar /home/ubuntu/your-app.jar"'  // Replace <EC2-IP> with your instance IP
+            }
+        }
+    }
+}
