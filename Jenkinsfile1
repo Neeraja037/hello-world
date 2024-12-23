@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk'
+        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk'  // Set JAVA_HOME to point to the JDK
         MAVEN_HOME = '/opt/maven'
-        PATH = "${MAVEN_HOME}/bin:${env.PATH}"
+        PATH = "${MAVEN_HOME}/bin:${JAVA_HOME}/bin:${env.PATH}"
     }
 
     stages {
@@ -17,24 +17,24 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Building the application...'
-                sh 'mvn clean install'  // Maven build command, adjust if using Gradle
+                sh 'mvn clean install'  // Build the application with Maven
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'mvn test'  // Maven test command
+                sh 'mvn test'  // Run tests
             }
         }
 
         stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
-                // For example, if you're deploying to a server
                 sh 'scp target/your-app.jar ubuntu@<EC2-IP>:/home/ubuntu/your-app.jar'
-                sh 'ssh ubuntu@<EC2-IP> "java -jar /home/ubuntu/your-app.jar"'  // Replace <EC2-IP> with your instance IP
+                sh 'ssh ubuntu@<EC2-IP> "java -jar /home/ubuntu/your-app.jar"'  // Run the app on the EC2 instance
             }
         }
     }
 }
+
